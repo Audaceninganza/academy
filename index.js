@@ -9,7 +9,7 @@ const T = {
     navCta: "Reserve a Spot",
     heroTag: "Muyange Academy · Burundi",
     heroTitle:
-      "Power belongs<br>to those with the wisdow<em>to think different.</em>.",
+      "Power belongs<br> to those with the wisdow<em> to think different.</em>.",
     heroSub: "English &amp; Computing skills for ages 5 to adult in Muyange.",
     heroGuarantee: "100% money-back guarantee if no progress in month 1",
     btnPricing: "See Pricing",
@@ -141,7 +141,7 @@ const T = {
     navCta: "Fata ikibanza",
     heroTag: "Muyange Academy · Burundi",
     heroTitle:
-      "Ubushobozi n'ubwabafise ubwenge<br><em>bwokwiyumvira mu buryo butandukanye.</em>.",
+      "Ubushobozi n'ubwabafise ubwenge<br><em>bwokwiyumvira mu buryo butandukanye</em>.",
     heroSub:
       "Ivyigwa vy'Icongereza n'ubuhinga bwa none ku bantu bose kuva kumyaka 5.",
     heroGuarantee:
@@ -356,11 +356,12 @@ document
     if (txtEl) txtEl.textContent = "";
 
     try {
-      const res = await fetch("/register", {
+      const res = await fetch("http://localhost:3000/enroll", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, age, phone, course, lang }),
       });
+
       const data = await res.json();
       if (data.success) {
         result.innerHTML = `<span class="result-ok">${t.successMsg(name, phone)}</span>`;
@@ -368,10 +369,9 @@ document
       } else {
         result.innerHTML = `<span class="result-err">⚠ ${data.message || t.errorMsg}</span>`;
       }
-    } catch {
-      // Demo fallback when no backend is running
-      result.innerHTML = `<span class="result-ok">${t.successMsg(name, phone)}</span>`;
-      form.reset();
+    } catch (err) {
+      console.error("Connection failed:", err);
+      result.innerHTML = `<span class="result-err">Could not connect to server.</span>`;
     } finally {
       btn.disabled = false;
       btn.classList.remove("loading");

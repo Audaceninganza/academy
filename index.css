@@ -4,7 +4,7 @@
       --ink:       #1a1612;
       --ink-muted: #5a5248;
       --ink-faint: #9a9088;
-      --cream:     #faf8f4;
+      --cream:     #ffffff;
       --cream-2:   #f3ede3;
       --cream-3:   #e8dfd0;
       --amber:     #c8781a;
@@ -15,8 +15,8 @@
       --purple-lt: #ede9f8;
       --green:     #15803d;
       --green-lt:  #dcfce7;
-      --serif: 'Playfair Display', Georgia, serif;
-      --sans:  'DM Sans', system-ui, sans-serif;
+      --serif: 'Playfair Display', sans-serif;
+      --sans: 'Open Sans', sans-serif;
     }
 
     html { scroll-behavior: smooth; }
