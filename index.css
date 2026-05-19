@@ -40,7 +40,7 @@
       padding: 0 2.5rem; gap: 1rem;
     }
     .nav-brand { font-family: var(--serif); font-size: 1.25rem; font-weight: 700; color: var(--ink); text-decoration: none; flex-shrink: 0; }
-    .nav-brand span { color: var(--amber); }
+    .nav-brand img { margin-top: 1rem; }
     .nav-center { display: flex; align-items: center; gap: 1.75rem; list-style: none; }
     .nav-center a { font-size: .875rem; font-weight: 500; color: var(--ink-muted); text-decoration: none; transition: color .2s; }
     .nav-center a:hover { color: var(--amber); }
@@ -255,4 +255,6 @@
       .hero-btns { flex-direction: column; }
       .btn-primary, .btn-outline { text-align: center; }
       .nav-cta {display: none;}
+      .nav-brand img {  width: 70px; height: 70px; }
+      
     }

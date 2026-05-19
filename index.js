@@ -10,16 +10,16 @@ const T = {
     heroTag: "Muyange Academy · Burundi",
     heroTitle:
       "Power belongs<br> to those with the wisdow<em> to think different.</em>.",
-    heroSub: "English &amp; Computing skills for ages 5 to adult in Muyange.",
+    heroSub: "English &amp; Computing skills for ages 6 to adult in Muyange.",
     heroGuarantee: "100% money-back guarantee if no progress in month 1",
     btnPricing: "See Pricing",
     btnRegister: "Register Now",
     hc1Label: "English courses",
     hc1Val: "Reading, Writing & Speaking",
-    hc1Pill: "Ages 5+",
+    hc1Pill: "Ages 6+",
     hc2Label: "Computing Skills",
     hc2Val: "Python, Web & Digital Skills",
-    hc2Pill: "Ages 5+",
+    hc2Pill: "Ages 6+",
     hc3Label: "Our promise",
     hc3Val: "No progress in 1 month? Full refund — no questions asked.",
     stat1: "Subjects taught",
@@ -31,7 +31,7 @@ const T = {
     tabEnglish: "📖 English Skills",
     tabProgramming: "🧑‍💻 Computing Skills",
     /* ── English course cards ── */
-    c_rw_t: "Level 1 · Ages 5–10",
+    c_rw_t: "Level 1 · Ages 6–10",
     c_rw_d:
       "Alphabet & letter recognition · Phonics (letter sounds) · Colors, numbers & shapes · Sight words (I, you, the…) · Listening: songs & short audio · Picture storytelling · Acting in simple English (movie-style).",
     c_sl_t: "Level 2 · Ages 10–15",
@@ -41,7 +41,7 @@ const T = {
     c_gr_d:
       "Listening & speaking training · Intermediate grammar · Morphology (word roots & affixes) · Professional letters & essays · CV & résumé writing · English for interviews · English for business/tech · Acting in intermediate English.",
     /* ── Computing course cards ── */
-    c_first_t: "Level 1 · Ages 5–10",
+    c_first_t: "Level 1 · Ages 6–10",
     c_first_d:
       "Learning by playing games · Typing skills on keyboard · Block coding (Scratch) · Internet safety basics · Digital creativity (drawing & animation tools).",
     c_second_t: "Level 2 · Ages 10–15",
@@ -59,7 +59,7 @@ const T = {
     rfbSub:
       "This fee is paid first, before starting any course. It confirms your place in the next intake and covers enrollment administration. It is separate from course fees.",
     rfbLabel: "one-time fee",
-    p1Subject: "Level 1 · Ages 5–10",
+    p1Subject: "Level 1 · Ages 6–10",
     p1Name: "English &amp; Computing",
     p1Period: "One-time payment",
     p1Note: "+ 30,000 Fbu registration fee (one-time, paid first)",
@@ -150,10 +150,10 @@ const T = {
     btnRegister: "Iyandikishe",
     hc1Label: "Ivyigwa vy'Icongereza",
     hc1Val: "Gusoma, Kwandika & Kuvuga",
-    hc1Pill: "Imyaka 5+",
+    hc1Pill: "Imyaka 6+",
     hc2Label: "ubuhinga bwa none",
     hc2Val: "Python, Urubuga & Ubuhinga bwa Numerique",
-    hc2Pill: "Imyaka 5+",
+    hc2Pill: "Imyaka 6+",
     hc3Label: "Isezerano ryacu",
     hc3Val:
       "Ntaterambere mukwezi 1? Amafaranga yawe yose asubizwa — ata nkomanzi.",
@@ -166,7 +166,7 @@ const T = {
     tabEnglish: "📖 Icongereza",
     tabProgramming: "🧑‍💻 Ubuhinga bwa none",
     /* ── English course cards ── */
-    c_rw_t: "Inivo ya 1 · Imyaka 5–10",
+    c_rw_t: "Inivo ya 1 · Imyaka 6–10",
     c_rw_d:
       "Alphabet & letter recognition · Phonics (letter sounds) · Colors, numbers & shapes · Sight words (I, you, the…) · Listening: songs & short audio · Picture storytelling · Acting in simple English (movie-style).",
     c_sl_t: "Inivo ya 2 · Imyaka 10–15",
@@ -176,7 +176,7 @@ const T = {
     c_gr_d:
       "Listening & speaking training · Intermediate grammar · Morphology (word roots & affixes) · Professional letters & essays · CV & résumé writing · English for interviews · English for business/tech · Acting in intermediate English.",
     /* ── Computing course cards ── */
-    c_first_t: "Inivo ya 1 · Imyaka 5–10",
+    c_first_t: "Inivo ya 1 · Imyaka 6–10",
     c_first_d:
       "Learning by playing games · Typing skills on keyboard · Block coding (Scratch) · Internet safety basics · Digital creativity (drawing & animation tools).",
     c_second_t: "Inivo ya 2 · Imyaka 10–15",
@@ -195,7 +195,7 @@ const T = {
     rfbSub:
       "Amafaranga yo kwiyandikisha arihwa imbere, imbere y'ivyigwa. afata ikibanza. Aratandukanye n'amafaranga y'ivyigwa.",
     rfbLabel: "atangwa rimwe",
-    p1Subject: "Inivo ya 1 · Imyaka 5–10",
+    p1Subject: "Inivo ya 1 · Imyaka 6–10",
     p1Name: "Icongereza &amp; Ubuhinga bwa none",
     p1Period: "Uriha rimwe",
     p1Note: "+  30.000 Fbu  yo kwiyandikisha (rimwe, arihwa imbere)",
@@ -227,12 +227,12 @@ const T = {
     rs1Sub: "Izina, imyaka, telefone n'ivyigwa.",
     rs2Title: "Ishura  30.000 Fbu  vyo kwiyandikisha",
     rs2Sub:
-      "Tuzakuvugisha mu masaha 24 hamwe n'amakuru yo kwishura. Ni co kizobika aho uzicara.",
+      "Turabandikira mu masaha 24 kugira murihe amahera yokwiyandikisha. afata ikibanza.",
     rs3Title: "Tangura ivyigwa",
-    rs3Sub: "Tuzoyemeza itariki uzotangurira n'amamarehe yawe kuri telefone.",
+    rs3Sub: "Umusi wogutangura tuzowubamenyesha kwitelefone.",
     rs4Title: "Turinda isezerano",
     rs4Sub:
-      "Ntaterambere mukwezi kwa 1? Turagusubiza 100% — n,amafaranga wiyandikishijeko. ata bibazo.",
+      "Ntaterambere mukwezi kwa 1? Turagusubiza 100% — n'amafaranga wiyandikishijeko ata bibazo.",
     formTitle: "Fata ikibanza",
     formSub: "Abaza mbere ni bo baronka ikibanza. Turabandikira mu masaha 24.",
     fLabelName: "Izina ryawe ryose",
@@ -249,7 +249,7 @@ const T = {
     fOpt5:
       "Inivo ya 3 — Icongereza &amp; ataterambere ubunye mukwezi 1 · Fbu 300.000",
     payNote:
-      "💳 Muheje kwiyandisha, Turazakubandira kugira murihe  <strong></strong> bifata ikibanza.",
+      "Muheje kwiyandisha, Turazakubandira kugira murihe  <strong></strong> bifata ikibanza.",
     fBtn: "Fata ikibanza →",
     successMsg: (n, p) =>
       `✓ Murakoze, ${n}! urahejeje gufata ikibanza. Turaguhamagara kur ${p} mumasaha 24 tkugira murihe  30.000 Fbu vyokwiyandikisha.`,
@@ -347,7 +347,7 @@ document
     const course = form.course.value;
 
     if (!name || !phone || !course || isNaN(age)) {
-      result.innerHTML = `<span class="result-err">⚠ ${lang === "rn" ? "Yuzura ibisabwa vyose." : "Please fill in all fields."}</span>`;
+      result.innerHTML = `<span class="result-err">⚠ ${lang === "rn" ? "Uzura ibisabwa vyose." : "Please fill in all fields."}</span>`;
       return;
     }
 

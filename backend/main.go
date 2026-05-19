@@ -10,7 +10,6 @@ import (
 	"github.com/supabase-community/supabase-go"
 )
 
-// Create a struct to match the incoming JSON
 type EnrollmentRequest struct {
 	Name   string `json:"name"`
 	Age    int    `json:"age"`
