@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enrollment Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0d0f12;
+    --surface: #151820;
+    --border:  #232733;
+    --accent:  #4ade80;
+    --accent2: #22d3ee;
+    --danger:  #f87171;
+    --warn:    #fbbf24;
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --mono:    'IBM Plex Mono', monospace;
+    --sans:    'IBM Plex Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  /* ── Auth gate ── */
+  #auth-gate {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 100vh; gap: 1.5rem;
+  }
+  .auth-box {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 2.5rem 3rem; width: 360px; position: relative;
+  }
+  .auth-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .auth-box h1 {
+    font-family: var(--mono); font-size: 1rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem;
+  }
+  .auth-box h1 span { color: var(--accent); }
+  .auth-input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: .9rem;
+    padding: .75rem 1rem; outline: none; transition: border-color .2s;
+  }
+  .auth-input:focus { border-color: var(--accent); }
+  .auth-btn {
+    width: 100%; margin-top: .75rem; background: var(--accent); color: #000;
+    font-family: var(--mono); font-size: .85rem; font-weight: 600;
+    letter-spacing: .08em; padding: .75rem; border: none; cursor: pointer; transition: opacity .15s;
+  }
+  .auth-btn:hover { opacity: .85; }
+  #auth-error { color: var(--danger); font-family: var(--mono); font-size: .8rem; margin-top: .5rem; display: none; }
+
+  /* ── Dashboard ── */
+  #dashboard { display: none; }
+
+  header {
+    border-bottom: 1px solid var(--border); padding: 1.1rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+  }
+  .logo { font-family: var(--mono); font-size: .85rem; letter-spacing: .14em; text-transform: uppercase; }
+  .logo span { color: var(--accent); }
+  .header-meta { font-family: var(--mono); font-size: .72rem; color: var(--muted); display: flex; align-items: center; gap: 1.5rem; }
+  .status-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  main { max-width: 1400px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  /* ── Stats ── */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px; border: 1px solid var(--border); margin-bottom: 2rem; overflow: hidden;
+  }
+  .stat-card { background: var(--surface); padding: 1.2rem 1.5rem; position: relative; }
+  .stat-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; height: 2px;
+    width: 0; background: var(--accent); transition: width .4s;
+  }
+  .stat-card:hover::after { width: 100%; }
+  .stat-label { font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+  .stat-value { font-family: var(--mono); font-size: 1.8rem; font-weight: 600; color: var(--text); }
+
+  /* ── Toolbar ── */
+  .toolbar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; }
+  .search-wrap input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: .83rem;
+    padding: .6rem 1rem .6rem 2.5rem; outline: none; transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent2); }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-icon { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .75rem; pointer-events: none; }
+
+  .btn {
+    font-family: var(--mono); font-size: .75rem; letter-spacing: .06em;
+    padding: .6rem 1.1rem; border: 1px solid var(--border); background: transparent;
+    color: var(--text); cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--text); }
+  .btn-accent { background: var(--accent); color: #000; border-color: var(--accent); }
+  .btn-accent:hover { opacity: .85; }
+  .btn-danger { border-color: var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #000; }
+
+  /* ── Table ── */
+  .table-wrap { border: 1px solid var(--border); overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  thead { background: var(--surface); }
+  th {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); text-align: left;
+    padding: .85rem 1rem; border-bottom: 1px solid var(--border);
+    white-space: nowrap; cursor: pointer; user-select: none;
+  }
+  th:hover { color: var(--text); }
+  th .sort-arrow { margin-left: .3rem; opacity: .4; }
+  th.sorted .sort-arrow { opacity: 1; color: var(--accent); }
+
+  td { padding: .85rem 1rem; border-bottom: 1px solid var(--border); font-size: .875rem; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .12s; }
+  tbody tr:hover { background: rgba(255,255,255,.025); }
+  .td-mono { font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+
+  .course-badge {
+    display: inline-block; font-family: var(--mono); font-size: .7rem;
+    letter-spacing: .06em; padding: .2rem .6rem; border: 1px solid;
+    color: var(--accent2);
+    border-color: color-mix(in srgb, var(--accent2) 30%, transparent);
+    background: color-mix(in srgb, var(--accent2) 8%, transparent);
+  }
+
+  /* ── Payment status badge ── */
+  .pay-badge {
+    display: inline-block; font-family: var(--mono); font-size: .68rem;
+    letter-spacing: .08em; text-transform: uppercase; padding: .2rem .55rem; border: 1px solid;
+  }
+  .pay-badge.paid    { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .pay-badge.pending { color: var(--warn);   border-color: color-mix(in srgb, var(--warn)   35%, transparent); background: color-mix(in srgb, var(--warn)   8%, transparent); }
+
+  /* ── Boolean check/cross ── */
+  .bool-yes { color: var(--accent); font-size: 1rem; }
+  .bool-no  { color: var(--muted);  font-size: 1rem; }
+
+  .actions { display: flex; gap: .5rem; }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: .8rem; transition: all .15s; flex-shrink: 0;
+  }
+  .icon-btn:hover { border-color: var(--text); color: var(--text); }
+  .icon-btn.edit:hover { border-color: var(--accent2); color: var(--accent2); }
+  .icon-btn.del:hover  { border-color: var(--danger);  color: var(--danger);  }
+
+  .empty-row td { text-align: center; padding: 3rem; color: var(--muted); font-family: var(--mono); font-size: .8rem; letter-spacing: .06em; }
+  .loader { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; margin-right: .5rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Modal ── */
+  #modal-bg {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(3px);
+  }
+  #modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    width: 480px; max-width: 95vw; position: relative; animation: slide-up .2s ease;
+  }
+  @keyframes slide-up { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+  .modal-header {
+    padding: 1.25rem 1.5rem; display: flex; align-items: center;
+    justify-content: space-between; border-bottom: 1px solid var(--border);
+  }
+  .modal-title { font-family: var(--mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .modal-title span { color: var(--text); }
+  .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; transition: color .15s; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 1.5rem; }
+
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-family: var(--mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+  .field input, .field select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--sans); font-size: .875rem;
+    padding: .65rem .85rem; outline: none; transition: border-color .2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent2); }
+  .field select option { background: var(--bg); }
+
+  /* checkbox toggle row */
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .toggle-wrap {
+    background: var(--bg); border: 1px solid var(--border); padding: .65rem .85rem;
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    transition: border-color .2s;
+  }
+  .toggle-wrap:hover { border-color: var(--accent2); }
+  .toggle-wrap input[type=checkbox] { display: none; }
+  .toggle-label { font-family: var(--mono); font-size: .75rem; color: var(--muted); user-select: none; }
+  .toggle-pill {
+    width: 36px; height: 20px; border-radius: 10px; background: var(--border);
+    position: relative; transition: background .2s; flex-shrink: 0;
+  }
+  .toggle-pill::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--muted); transition: all .2s;
+  }
+  .toggle-wrap.on .toggle-pill { background: var(--accent); }
+  .toggle-wrap.on .toggle-pill::after { left: 19px; background: #000; }
+  .toggle-wrap.on .toggle-label { color: var(--accent); }
+
+  .modal-footer {
+    padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: .75rem;
+  }
+
+  /* ── Confirm ── */
+  #confirm-bg {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75);
+    z-index: 150; align-items: center; justify-content: center; backdrop-filter: blur(3px);
+  }
+  #confirm-bg.open { display: flex; }
+  .confirm-box {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 2rem; width: 340px; max-width: 95vw; text-align: center; animation: slide-up .2s ease;
+  }
+  .confirm-box::before { content: ''; display: block; width: 100%; height: 2px; background: var(--danger); margin-bottom: 1.5rem; }
+  .confirm-title { font-family: var(--mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--danger); margin-bottom: .5rem; }
+  .confirm-text { font-size: .875rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+  .confirm-text strong { color: var(--text); }
+  .confirm-actions { display: flex; gap: .75rem; justify-content: center; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem; background: var(--surface);
+    border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    padding: .85rem 1.25rem; font-family: var(--mono); font-size: .78rem;
+    z-index: 200; transform: translateY(10px); opacity: 0; transition: all .25s;
+    pointer-events: none; max-width: 280px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.error { border-left-color: var(--danger); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="auth-box">
+    <h1>// <span>admin</span> access</h1>
+    <input id="secret-input" class="auth-input" type="password" placeholder="Enter admin secret…" autocomplete="off">
+    <button class="auth-btn" onclick="login()">AUTHENTICATE →</button>
+    <div id="auth-error">✗ Invalid secret. Access denied.</div>
+  </div>
+  <div style="font-family:var(--mono);font-size:.68rem;color:var(--muted);">Enrollment Management · Restricted Area</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="logo">// <span>enroll</span> · admin</div>
+    <div class="header-meta">
+      <span><span class="status-dot"></span> CONNECTED</span>
+      <span id="hdr-count">— students</span>
+      <span id="hdr-time">—</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Enrolled</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Paid</div>
+        <div class="stat-value" id="stat-paid" style="color:var(--accent)">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="stat-pending" style="color:var(--warn)">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reg. Fees Paid</div>
+        <div class="stat-value" id="stat-regfees">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Full Package</div>
+        <div class="stat-value" id="stat-fullpkg">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Courses Active</div>
+        <div class="stat-value" id="stat-courses">—</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="search-input" placeholder="Search by name, course, phone…" oninput="filterTable()">
+      </div>
+      <select id="filter-payment" onchange="filterTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.75rem;padding:.6rem .85rem;outline:none;cursor:pointer;">
+        <option value="">All payments</option>
+        <option value="paid">Paid</option>
+        <option value="pending">Pending</option>
+      </select>
+      <button class="btn" onclick="loadStudents()">↻ Refresh</button>
+      <button class="btn" onclick="exportCSV()">↓ CSV</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('full_name')"    data-col="full_name">Name <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('age')"           data-col="age">Age <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('phone')"         data-col="phone">Phone <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('course_slug')"   data-col="course_slug">Course <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('payment_status')" data-col="payment_status">Payment <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('registration_fees')" data-col="registration_fees">Reg. Fee <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('full_package')"  data-col="full_package">Full Pkg <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('created_at')"    data-col="created_at">Enrolled <span class="sort-arrow">↕</span></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="student-tbody">
+          <tr class="empty-row"><td colspan="9"><span class="loader"></span> Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="table-footer" style="font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:.75rem;"></div>
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit student · <span id="modal-id-label"></span></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="edit-name">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Age</label>
+          <input type="number" id="edit-age" min="1" max="120">
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="text" id="edit-phone">
+        </div>
+      </div>
+      <div class="field">
+        <label>Course Slug</label>
+        <input type="text" id="edit-course">
+      </div>
+      <div class="field">
+        <label>Payment Status</label>
+        <select id="edit-payment-status">
+          <option value="pending">Pending</option>
+          <option value="paid">Paid</option>
+        </select>
+      </div>
+      <div class="field-row" style="margin-top:.25rem">
+        <div class="field">
+          <label>Registration Fees</label>
+          <div class="toggle-wrap" id="toggle-regfees" onclick="toggleField('toggle-regfees','edit-regfees')">
+            <span class="toggle-label">Paid</span>
+            <input type="checkbox" id="edit-regfees">
+            <div class="toggle-pill"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Full Package</label>
+          <div class="toggle-wrap" id="toggle-fullpkg" onclick="toggleField('toggle-fullpkg','edit-fullpkg')">
+            <span class="toggle-label">Paid</span>
+            <input type="checkbox" id="edit-fullpkg">
+            <div class="toggle-pill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div id="confirm-bg" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-box">
+    <div class="confirm-title">Confirm Delete</div>
+    <div class="confirm-text">Remove <strong id="confirm-name"></strong> from enrollments?<br>This action cannot be undone.</div>
+    <div class="confirm-actions">
+      <button class="btn" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let ADMIN_SECRET = '';
+let allStudents  = [];
+let sortCol      = 'created_at';
+let sortAsc      = false;
+let deleteTargetId   = null;
+let deleteTargetName = '';
+
+// Pre-supplied secret via ?secret=
+(function() {
+  const p = new URLSearchParams(location.search).get('secret');
+  if (p) { ADMIN_SECRET = p; showDashboard(); loadStudents(); }
+})();
+
+document.getElementById('secret-input').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+function login() {
+  const val = document.getElementById('secret-input').value.trim();
+  if (!val) return;
+  ADMIN_SECRET = val;
+  fetch('/admin/students', { headers: { 'X-Admin-Secret': ADMIN_SECRET } })
+    .then(r => {
+      if (r.status === 401) {
+        document.getElementById('auth-error').style.display = 'block';
+        ADMIN_SECRET = '';
+      } else if (r.ok) {
+        showDashboard();
+        r.json().then(data => processStudents(data));
+      }
+    })
+    .catch(() => toast('Connection error', true));
+}
+
+function showDashboard() {
+  document.getElementById('auth-gate').style.display  = 'none';
+  document.getElementById('dashboard').style.display  = 'block';
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+function loadStudents() {
+  setTbody(`<tr class="empty-row"><td colspan="9"><span class="loader"></span> Fetching…</td></tr>`);
+  fetch('/admin/students', { headers: { 'X-Admin-Secret': ADMIN_SECRET } })
+    .then(r => r.json())
+    .then(data => processStudents(data))
+    .catch(() => setTbody(`<tr class="empty-row"><td colspan="9">⚠ Failed to load.</td></tr>`));
+}
+
+function processStudents(data) {
+  allStudents = Array.isArray(data) ? data : [];
+  updateStats();
+  renderTable();
+  document.getElementById('hdr-time').textContent = `Last sync ${new Date().toLocaleTimeString()}`;
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const total    = allStudents.length;
+  const paid     = allStudents.filter(s => s.payment_status === 'paid').length;
+  const pending  = allStudents.filter(s => s.payment_status === 'pending').length;
+  const regfees  = allStudents.filter(s => s.registration_fees).length;
+  const fullpkg  = allStudents.filter(s => s.full_package).length;
+  const courses  = new Set(allStudents.map(s => s.course_slug)).size;
+
+  document.getElementById('stat-total').textContent   = total;
+  document.getElementById('stat-paid').textContent    = paid;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-regfees').textContent = regfees;
+  document.getElementById('stat-fullpkg').textContent = fullpkg;
+  document.getElementById('stat-courses').textContent = courses;
+  document.getElementById('hdr-count').textContent    = `${total} students`;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderTable() {
+  const q    = document.getElementById('search-input').value.toLowerCase();
+  const payF = document.getElementById('filter-payment').value;
+
+  let rows = allStudents.filter(s => {
+    const matchSearch =
+      (s.full_name   || '').toLowerCase().includes(q) ||
+      (s.course_slug || '').toLowerCase().includes(q) ||
+      (s.phone       || '').includes(q);
+    const matchPay = payF === '' || s.payment_status === payF;
+    return matchSearch && matchPay;
+  });
+
+  rows.sort((a, b) => {
+    let va = a[sortCol] ?? '';
+    let vb = b[sortCol] ?? '';
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    return sortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.classList.toggle('sorted', th.dataset.col === sortCol);
+    const arr = th.querySelector('.sort-arrow');
+    if (arr) arr.textContent = th.dataset.col === sortCol ? (sortAsc ? '↑' : '↓') : '↕';
+  });
+
+  if (!rows.length) {
+    setTbody(`<tr class="empty-row"><td colspan="9">${q || payF ? 'No matching records.' : 'No students enrolled yet.'}</td></tr>`);
+    document.getElementById('table-footer').textContent = '';
+    return;
+  }
+
+  const html = rows.map(s => `
+    <tr data-id="${s.id}">
+      <td>${esc(s.full_name || '—')}</td>
+      <td class="td-mono">${s.age || '—'}</td>
+      <td class="td-mono">${esc(s.phone || '—')}</td>
+      <td><span class="course-badge">${esc(s.course_slug || '—')}</span></td>
+      <td><span class="pay-badge ${s.payment_status === 'paid' ? 'paid' : 'pending'}">${s.payment_status || 'pending'}</span></td>
+      <td>${s.registration_fees ? '<span class="bool-yes">✓</span>' : '<span class="bool-no">—</span>'}</td>
+      <td>${s.full_package      ? '<span class="bool-yes">✓</span>' : '<span class="bool-no">—</span>'}</td>
+      <td class="td-mono">${fmtDate(s.created_at)}</td>
+      <td>
+        <div class="actions">
+          <button class="icon-btn edit" title="Edit"   data-action="edit"   data-id="${s.id}">✎</button>
+          <button class="icon-btn del"  title="Delete" data-action="delete" data-id="${s.id}" data-name="${esc(s.full_name || '')}">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  setTbody(html);
+  document.getElementById('table-footer').textContent = `Showing ${rows.length} of ${allStudents.length} records`;
+}
+
+// ── Toggle helper ─────────────────────────────────────────────────────────────
+function toggleField(wrapId, inputId) {
+  const wrap  = document.getElementById(wrapId);
+  const input = document.getElementById(inputId);
+  input.checked = !input.checked;
+  wrap.classList.toggle('on', input.checked);
+}
+
+function setToggle(wrapId, inputId, val) {
+  const wrap  = document.getElementById(wrapId);
+  const input = document.getElementById(inputId);
+  input.checked = val;
+  wrap.classList.toggle('on', val);
+}
+
+// ── Edit modal ────────────────────────────────────────────────────────────────
+function openEdit(id) {
+  const s = allStudents.find(x => String(x.id) === String(id));
+  if (!s) return;
+  document.getElementById('edit-id').value     = s.id;
+  document.getElementById('edit-name').value   = s.full_name    || '';
+  document.getElementById('edit-age').value    = s.age          || '';
+  document.getElementById('edit-phone').value  = s.phone        || '';
+  document.getElementById('edit-course').value = s.course_slug  || '';
+  document.getElementById('edit-payment-status').value = s.payment_status || 'pending';
+  setToggle('toggle-regfees', 'edit-regfees', !!s.registration_fees);
+  setToggle('toggle-fullpkg', 'edit-fullpkg', !!s.full_package);
+  document.getElementById('modal-id-label').textContent = `#${s.id}`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
+
+function saveEdit() {
+  const id            = document.getElementById('edit-id').value;
+  const name          = document.getElementById('edit-name').value.trim();
+  const age           = parseInt(document.getElementById('edit-age').value);
+  const phone         = document.getElementById('edit-phone').value.trim();
+  const course        = document.getElementById('edit-course').value.trim();
+  const payment_status    = document.getElementById('edit-payment-status').value;
+  const registration_fees = document.getElementById('edit-regfees').checked;
+  const full_package      = document.getElementById('edit-fullpkg').checked;
+
+  if (!name || !age || !phone || !course) { toast('All fields are required', true); return; }
+
+  fetch(`/admin/students/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET },
+    body: JSON.stringify({ name, age, phone, course, payment_status, registration_fees, full_package })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) { closeModal(); toast('Student updated ✓'); loadStudents(); }
+    else toast(data.error || 'Update failed', true);
+  })
+  .catch(() => toast('Network error', true));
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+function openDelete(id, name) {
+  deleteTargetId = String(id); deleteTargetName = name;
+  document.getElementById('confirm-name').textContent = name;
+  document.getElementById('confirm-bg').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirm-bg').classList.remove('open'); deleteTargetId = null; }
+function confirmDelete() {
+  if (!deleteTargetId) return;
+  fetch(`/admin/students/${deleteTargetId}`, { method: 'DELETE', headers: { 'X-Admin-Secret': ADMIN_SECRET } })
+    .then(r => r.json())
+    .then(data => {
+      closeConfirm();
+      if (data.success) { toast(`${deleteTargetName} removed`); loadStudents(); }
+      else toast(data.error || 'Delete failed', true);
+    })
+    .catch(() => toast('Network error', true));
+}
+
+// ── Sort / filter ─────────────────────────────────────────────────────────────
+function sortBy(col) { sortCol === col ? (sortAsc = !sortAsc) : (sortCol = col, sortAsc = true); renderTable(); }
+function filterTable() { renderTable(); }
+
+// ── CSV export ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!allStudents.length) { toast('No data to export', true); return; }
+  const header = ['ID','Full Name','Age','Phone','Course','Payment Status','Reg. Fees','Full Package','Enrolled At'];
+  const rows   = allStudents.map(s => [
+    s.id,
+    `"${(s.full_name||'').replace(/"/g,'""')}"`,
+    s.age, s.phone, s.course_slug,
+    s.payment_status,
+    s.registration_fees ? 'yes' : 'no',
+    s.full_package      ? 'yes' : 'no',
+    s.created_at
+  ]);
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `enrollments_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('CSV exported ✓');
+}
+
+// ── Event delegation — one listener handles all row buttons ──────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('student-tbody').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id     = btn.dataset.id;
+    const action = btn.dataset.action;
+    if (action === 'edit')   openEdit(id);
+    if (action === 'delete') openDelete(id, btn.dataset.name);
+  });
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setTbody(html) { document.getElementById('student-tbody').innerHTML = html; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+let toastTimer;
+function toast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+}
+setInterval(() => { if (ADMIN_SECRET) document.getElementById('hdr-time').textContent = new Date().toLocaleTimeString(); }, 1000);
+</script>
+</body>
+</html>
