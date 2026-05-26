@@ -1,10 +1,11 @@
 /* ══════════════════════════════════════════════
-   TRANSLATIONS  (ENGLISH & KIRUNDI)
+   SUPABASE CLIENT (direct — no backend needed)
 ══════════════════════════════════════════════ */
-const T = {
-  en: {
-    navCourses: "Courses",
-    navPricing: "Pricing",
+const SUPABASE_URL = 'https://okmaixwyvxeogjjdfpqy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rbWFpeHd5dnhlb2dqamRmcHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTE5MzUsImV4cCI6MjA5MjYyNzkzNX0.AGcEPaoM8sKRwtxilaF9_Ov3uX4PZUKILw_Zcu3l2h0';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     navEnroll: "Enroll",
     navCta: "Reserve a Spot",
     heroTag: "Muyange Academy · Burundi",
@@ -356,18 +357,22 @@ document
     if (txtEl) txtEl.textContent = "";
 
     try {
-      const res = await fetch("http://localhost:3000/enroll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, age, phone, course, lang }),
-      });
+      const { error } = await sb.from('enrollments').insert([{
+        full_name: name,
+        age: age,
+        phone: phone,
+        course_slug: course,
+        payment_status: 'pending',
+        registration_fees: false,
+        full_package: false,
+      }]);
 
-      const data = await res.json();
-      if (data.success) {
+      if (!error) {
         result.innerHTML = `<span class="result-ok">${t.successMsg(name, phone)}</span>`;
         form.reset();
       } else {
-        result.innerHTML = `<span class="result-err">⚠ ${data.message || t.errorMsg}</span>`;
+        console.error("Supabase error:", error);
+        result.innerHTML = `<span class="result-err">⚠ ${error.message || t.errorMsg}</span>`;
       }
     } catch (err) {
       console.error("Connection failed:", err);
